@@ -6,7 +6,7 @@ st.set_page_config( layout = "wide" )
 option = smom.option_menu( "Menu", [ "Describe Mode", "Select Mode" ] )
 
 gg.configure( api_key = "AIzaSyA4O1-zyvh5PdWvQUt4hjTd1R5z6xI5A9w" )
-model = gg.GenerativeModel( "gemini-1.5-flash" )
+model = gg.GenerativeModel( "gemini-1.5-pro" )
 
 if option == "Describe Mode":
     st.title( "Meal Planner || Describe Mode" )
@@ -35,3 +35,4 @@ elif option == "Select Mode":
         responce = model.generate_content( [ prompt ] )
         st.write( "Here is the meal plan" )
         st.write( responce.text )
+
