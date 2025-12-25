@@ -8,7 +8,7 @@ import streamlit_option_menu as smom
 st.set_page_config( layout = "wide" )
 
 gg.configure( api_key = "AIzaSyCmpSfdm0DVMx9O2d-PVDCrhx_UQfqJwTo" )
-model = gg.GenerativeModel( "gemini-1.5-pro" )
+model = gg.GenerativeModel( "models/gemini-pro" )
 
 option = smom.option_menu(
     "Menu",
@@ -66,5 +66,6 @@ elif option == "Select Mode":
 
         st.subheader( "Here is the meal plan" )
         st.write( response.text )
+
 
 
