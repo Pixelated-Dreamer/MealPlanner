@@ -1,38 +1,69 @@
+import os
+os.environ[ "STREAMLIT_SERVER_RUN_ON_SAVE" ] = "false"
+
 import streamlit as st
 import google.generativeai as gg
 import streamlit_option_menu as smom
 
 st.set_page_config( layout = "wide" )
-option = smom.option_menu( "Menu", [ "Describe Mode", "Select Mode" ] )
 
-gg.configure( api_key = "AIzaSyA4O1-zyvh5PdWvQUt4hjTd1R5z6xI5A9w" )
+gg.configure( api_key = "YOUR_API_KEY_HERE" )
 model = gg.GenerativeModel( "gemini-1.5-pro" )
+
+option = smom.option_menu(
+    "Menu",
+    [ "Describe Mode", "Select Mode" ],
+    icons = [ "chat", "list" ],
+    menu_icon = "cast"
+)
 
 if option == "Describe Mode":
     st.title( "Meal Planner || Describe Mode" )
-    st.write( "Please tell our experts what you want to eat. In a few sentences. Please be specific." )
+    st.write( "Please describe what you want to eat in a few sentences. Be specific." )
+
     meal_description = st.text_area( "What do you want to eat?" )
 
-    if st.button( "Submit" ):
-        prompt = f"please find a recipie for the following meal description {meal_description}"
-        model.generate_content( [ prompt ] )
-        st.write( "Here is the meal plan" )
-        st.write( model.generate_content( [ prompt ] ).text )
+    if st.button( "Submit" ) and meal_description.strip():
+        prompt = f"""
+        Find a complete recipe based on the following meal description.
+        Include ingredients, step-by-step instructions, and estimated prep time.
+
+        Meal description:
+        {meal_description}
+        """
+
+        response = model.generate_content( [ prompt ] )
+
+        st.subheader( "Here is the meal plan" )
+        st.write( response.text )
 
 elif option == "Select Mode":
     st.title( "Meal Planner || Select Mode" )
-    
-    country = st.text_input( "What country do you want to find a recipie from?" )
-    prep_time = st.slider( "How long should it take to prepare the meal( in minutes ) ?", 5, 300 )
-    people_served = st.slider( "How many people will be served?", 1, 5 )
-    dietary_restrictions = st.multiselect( "What are the dietary restrictions?", [ "vegetarian", "vegan", "gluten free", "dairy free", "nut free", "soy free" ] )
-    ingrediants = st.text_input( "What some ingredients you want to include in the meal?" )
+
+    country = st.text_input( "What country do you want the recipe from?" )
+    prep_time = st.slider( "Preparation time (minutes)", 5, 300 )
+    people_served = st.slider( "Number of people served", 1, 10 )
+    dietary_restrictions = st.multiselect(
+        "Dietary restrictions",
+        [ "vegetarian", "vegan", "gluten free", "dairy free", "nut free", "soy free" ]
+    )
+    ingredients = st.text_input( "Ingredients you want to include" )
 
     if st.button( "Submit" ):
-        prompt = f"""please find a recipie for a {country} meal that takes {prep_time} minutes to prepare
-          and serves {people_served} people. The meal should have the following dietary restrictions {dietary_restrictions}
-            and include the following ingredients {ingrediants}"""
-        responce = model.generate_content( [ prompt ] )
-        st.write( "Here is the meal plan" )
-        st.write( responce.text )
+        prompt = f"""
+        Create a detailed recipe with the following constraints:
+
+        Cuisine country: {country}
+        Preparation time: {prep_time} minutes
+        Serves: {people_served} people
+        Dietary restrictions: {", ".join( dietary_restrictions ) if dietary_restrictions else "none"}
+        Ingredients to include: {ingredients}
+
+        Include ingredients list, step-by-step cooking instructions, and tips.
+        """
+
+        response = model.generate_content( [ prompt ] )
+
+        st.subheader( "Here is the meal plan" )
+        st.write( response.text )
 
